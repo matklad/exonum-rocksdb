@@ -54,18 +54,19 @@ mod db_options;
 mod transaction_db;
 mod transaction;
 
-pub use db::{DBCompactionStyle, DBCompressionType, DBIterator, DBRawIterator, DBRecoveryMode, DBVector,
-             ReadOptions, Direction, IteratorMode, Snapshot, WriteBatch, new_bloom_filter};
-
-pub use transaction_db::{TransactionDB, TransactionDBOptions};
-pub use transaction::{Transaction, TransactionOptions};
+pub use compaction_filter::Decision as CompactionDecision;
+pub use db::{DBCompactionStyle, DBCompressionType, DBIterator, DBRawIterator, DBRecoveryMode,
+             DBVector, ReadOptions, Direction, IteratorMode, Snapshot, WriteBatch,
+             new_bloom_filter};
 
 pub use merge_operator::MergeOperands;
-pub use compaction_filter::Decision as CompactionDecision;
 use std::collections::BTreeMap;
 use std::error;
 use std::fmt;
 use std::path::PathBuf;
+pub use transaction::{Transaction, TransactionOptions};
+
+pub use transaction_db::{TransactionDB, TransactionDBOptions};
 
 /// A RocksDB database.
 ///

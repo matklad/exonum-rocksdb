@@ -38,7 +38,11 @@ pub fn test_iterator() {
         assert!(p.is_ok());
         let p = db.put(&*k3, &*v3);
         assert!(p.is_ok());
-        let expected = vec![(cba(&k1), cba(&v1)), (cba(&k2), cba(&v2)), (cba(&k3), cba(&v3))];
+        let expected = vec![
+            (cba(&k1), cba(&v1)),
+            (cba(&k2), cba(&v2)),
+            (cba(&k3), cba(&v3)),
+        ];
         {
             let iterator1 = db.iterator(IteratorMode::Start);
             assert_eq!(iterator1.collect::<Vec<_>>(), expected);
@@ -100,10 +104,12 @@ pub fn test_iterator() {
         let old_iterator = db.iterator(IteratorMode::Start);
         let p = db.put(&*k4, &*v4);
         assert!(p.is_ok());
-        let expected2 = vec![(cba(&k1), cba(&v1)),
-                             (cba(&k2), cba(&v2)),
-                             (cba(&k3), cba(&v3)),
-                             (cba(&k4), cba(&v4))];
+        let expected2 = vec![
+            (cba(&k1), cba(&v1)),
+            (cba(&k2), cba(&v2)),
+            (cba(&k3), cba(&v3)),
+            (cba(&k4), cba(&v4)),
+        ];
         {
             assert_eq!(old_iterator.collect::<Vec<_>>(), expected);
         }
@@ -113,7 +119,11 @@ pub fn test_iterator() {
         }
         {
             let iterator1 = db.iterator(IteratorMode::From(b"k2", Direction::Forward));
-            let expected = vec![(cba(&k2), cba(&v2)), (cba(&k3), cba(&v3)), (cba(&k4), cba(&v4))];
+            let expected = vec![
+                (cba(&k2), cba(&v2)),
+                (cba(&k3), cba(&v3)),
+                (cba(&k4), cba(&v4)),
+            ];
             assert_eq!(iterator1.collect::<Vec<_>>(), expected);
         }
         {

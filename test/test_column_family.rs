@@ -42,14 +42,17 @@ pub fn test_column_family() {
         opts.set_merge_operator("test operator", test_provided_merge);
         match DB::open(&opts, path) {
             Ok(_) => {
-                panic!("should not have opened DB successfully without \
+                panic!(
+                    "should not have opened DB successfully without \
                         specifying column
-            families")
+            families"
+                )
             }
             Err(e) => {
-                assert!(e.to_string()
-                    .starts_with("Invalid argument: You have to open all \
-                                  column families."))
+                assert!(e.to_string().starts_with(
+                    "Invalid argument: You have to open all \
+                                  column families.",
+                ))
             }
         }
     }
@@ -64,11 +67,9 @@ pub fn test_column_family() {
         }
     }
     // TODO should be able to use writebatch ops with a cf
-    {
-    }
+    {}
     // TODO should be able to iterate over a cf
-    {
-    }
+    {}
     // should b able to drop a cf
     {
         let mut db = DB::open_cf(&Options::default(), path, &["cf1"]).unwrap();
@@ -128,10 +129,11 @@ fn test_merge_operator() {
 
 }
 
-fn test_provided_merge(_: &[u8],
-                       existing_val: Option<&[u8]>,
-                       operands: &mut MergeOperands)
-                       -> Vec<u8> {
+fn test_provided_merge(
+    _: &[u8],
+    existing_val: Option<&[u8]>,
+    operands: &mut MergeOperands,
+) -> Vec<u8> {
     let nops = operands.size_hint().0;
     let mut result: Vec<u8> = Vec::with_capacity(nops);
     match existing_val {

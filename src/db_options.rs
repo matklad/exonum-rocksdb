@@ -16,13 +16,13 @@
 
 use {BlockBasedOptions, DBCompactionStyle, DBCompressionType, DBRecoveryMode, Options,
      WriteOptions};
+use compaction_filter::{self, CompactionFilterCallback, CompactionFilterFn, filter_callback};
 use comparator::{self, ComparatorCallback, CompareFn};
 use ffi;
 
 use libc::{self, c_int, c_uchar, c_uint, c_void, size_t, uint64_t};
 use merge_operator::{self, MergeFn, MergeOperatorCallback, full_merge_callback,
                      partial_merge_callback};
-use compaction_filter::{self, CompactionFilterCallback, CompactionFilterFn, filter_callback};
 use std::ffi::{CStr, CString};
 use std::mem;
 
@@ -124,7 +124,8 @@ impl Options {
         unsafe {
             ffi::rocksdb_options_optimize_level_style_compaction(
                 self.inner,
-                memtable_memory_budget as uint64_t);
+                memtable_memory_budget as uint64_t,
+            );
         }
     }
 
@@ -191,9 +192,11 @@ impl Options {
     pub fn set_compression_per_level(&mut self, level_types: &[DBCompressionType]) {
         unsafe {
             let level_types: Vec<_> = level_types.iter().map(|&t| t as c_int).collect();
-            ffi::rocksdb_options_set_compression_per_level(self.inner,
-                                                           level_types.as_ptr(),
-                                                           level_types.len() as size_t)
+            ffi::rocksdb_options_set_compression_per_level(
+                self.inner,
+                level_types.as_ptr(),
+                level_types.len() as size_t,
+            )
         }
     }
 
@@ -204,17 +207,20 @@ impl Options {
         });
 
         unsafe {
-            let mo = ffi::rocksdb_mergeoperator_create(mem::transmute(cb),
-                                                       Some(merge_operator::destructor_callback),
-                                                       Some(full_merge_callback),
-                                                       Some(partial_merge_callback),
-                                                       None,
-                                                       Some(merge_operator::name_callback));
+            let mo = ffi::rocksdb_mergeoperator_create(
+                mem::transmute(cb),
+                Some(merge_operator::destructor_callback),
+                Some(full_merge_callback),
+                Some(partial_merge_callback),
+                None,
+                Some(merge_operator::name_callback),
+            );
             ffi::rocksdb_options_set_merge_operator(self.inner, mo);
         }
     }
 
-    #[deprecated(since="0.5.0", note="add_merge_operator has been renamed to set_merge_operator")]
+    #[deprecated(since = "0.5.0",
+                 note = "add_merge_operator has been renamed to set_merge_operator")]
     pub fn add_merge_operator(&mut self, name: &str, merge_fn: MergeFn) {
         self.set_merge_operator(name, merge_fn);
     }
@@ -230,7 +236,8 @@ impl Options {
     /// If multi-threaded compaction is used, `filter_fn` may be called multiple times
     /// simultaneously.
     pub fn set_compaction_filter<F>(&mut self, name: &str, filter_fn: F)
-        where F: CompactionFilterFn + Send + 'static
+    where
+        F: CompactionFilterFn + Send + 'static,
     {
         let cb = Box::new(CompactionFilterCallback {
             name: CString::new(name.as_bytes()).unwrap(),
@@ -238,10 +245,12 @@ impl Options {
         });
 
         unsafe {
-            let cf = ffi::rocksdb_compactionfilter_create(mem::transmute(cb),
-                                                          Some(compaction_filter::destructor_callback::<F>),
-                                                          Some(filter_callback::<F>),
-                                                          Some(compaction_filter::name_callback::<F>));
+            let cf = ffi::rocksdb_compactionfilter_create(
+                mem::transmute(cb),
+                Some(compaction_filter::destructor_callback::<F>),
+                Some(filter_callback::<F>),
+                Some(compaction_filter::name_callback::<F>),
+            );
             ffi::rocksdb_options_set_compaction_filter(self.inner, cf);
         }
     }
@@ -259,10 +268,12 @@ impl Options {
         });
 
         unsafe {
-            let cmp = ffi::rocksdb_comparator_create(mem::transmute(cb),
-                                                     Some(comparator::destructor_callback),
-                                                     Some(comparator::compare_callback),
-                                                     Some(comparator::name_callback));
+            let cmp = ffi::rocksdb_comparator_create(
+                mem::transmute(cb),
+                Some(comparator::destructor_callback),
+                Some(comparator::compare_callback),
+                Some(comparator::name_callback),
+            );
             ffi::rocksdb_options_set_comparator(self.inner, cmp);
         }
     }

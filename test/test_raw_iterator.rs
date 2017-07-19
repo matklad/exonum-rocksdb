@@ -38,9 +38,9 @@ pub fn test_forwards_iteration() {
     assert_eq!(iter.key(), Some(b"k2".to_vec()));
     assert_eq!(iter.value(), Some(b"v2".to_vec()));
 
-    iter.next();  // k3
-    iter.next();  // k4
-    iter.next();  // invalid!
+    iter.next(); // k3
+    iter.next(); // k4
+    iter.next(); // invalid!
 
     assert_eq!(iter.valid(), false);
     assert_eq!(iter.key(), None);
@@ -69,9 +69,9 @@ pub fn test_seek_last() {
     assert_eq!(iter.key(), Some(b"k3".to_vec()));
     assert_eq!(iter.value(), Some(b"v3".to_vec()));
 
-    iter.prev();  // k2
-    iter.prev();  // k1
-    iter.prev();  // invalid!
+    iter.prev(); // k2
+    iter.prev(); // k1
+    iter.prev(); // invalid!
 
     assert_eq!(iter.valid(), false);
     assert_eq!(iter.key(), None);

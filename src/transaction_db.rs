@@ -1,12 +1,12 @@
+use super::{ColumnFamily, Options, Error, Transaction, ReadOptions, WriteOptions,
+            TransactionOptions, DBVector};
 use ffi;
-use std::ffi::CString;
-use std::collections::BTreeMap;
-use std::path::{Path, PathBuf};
-use std::fs;
 
 use libc::{self, c_char, c_int, c_uchar, c_void, size_t};
-use super::{ColumnFamily, Options, Error, Transaction, ReadOptions, 
-            WriteOptions, TransactionOptions, DBVector};
+use std::collections::BTreeMap;
+use std::ffi::CString;
+use std::fs;
+use std::path::{Path, PathBuf};
 
 unsafe impl Send for TransactionDB {}
 unsafe impl Sync for TransactionDB {}
@@ -17,12 +17,12 @@ pub struct TransactionDB {
 }
 
 pub struct TransactionDBOptions {
-    inner: *mut ffi::rocksdb_transactiondb_options_t
+    inner: *mut ffi::rocksdb_transactiondb_options_t,
 }
 
 pub struct Snapshot<'a> {
     db: &'a TransactionDB,
-    inner: *const ffi::rocksdb_snapshot_t
+    inner: *const ffi::rocksdb_snapshot_t,
 }
 
 impl TransactionDB {
@@ -35,29 +35,37 @@ impl TransactionDB {
     }
 
     /// Open the transactional database with the specified options.
-    pub fn open<P: AsRef<Path>>(opts: &Options, 
-                                txn_db_opts: &TransactionDBOptions, 
-                                path: P) -> Result<Self, Error> {
+    pub fn open<P: AsRef<Path>>(
+        opts: &Options,
+        txn_db_opts: &TransactionDBOptions,
+        path: P,
+    ) -> Result<Self, Error> {
         let path = path.as_ref();
         let cpath = match CString::new(path.to_string_lossy().as_bytes()) {
             Ok(c) => c,
             Err(_) => {
-                return Err(Error::new("Failed to convert path to CString \
+                return Err(Error::new(
+                    "Failed to convert path to CString \
                                        when opening DB."
-                    .to_owned()))
+                        .to_owned(),
+                ))
             }
         };
 
         if let Err(e) = fs::create_dir_all(&path) {
-            return Err(Error::new(format!("Failed to create RocksDB \
+            return Err(Error::new(format!(
+                "Failed to create RocksDB \
                                            directory: `{:?}`.",
-                                          e)));
+                e
+            )));
         }
 
         let db: *mut ffi::rocksdb_transactiondb_t = unsafe {
-            ffi_try!(ffi::rocksdb_transactiondb_open(opts.inner, 
-                                                     txn_db_opts.inner,
-                                                     cpath.as_ptr() as *const _))
+            ffi_try!(ffi::rocksdb_transactiondb_open(
+                opts.inner,
+                txn_db_opts.inner,
+                cpath.as_ptr() as *const _
+            ))
         };
 
         if db.is_null() {
@@ -77,21 +85,25 @@ impl TransactionDB {
 
     pub fn get_opt(&self, key: &[u8], read_opts: &ReadOptions) -> Result<Option<DBVector>, Error> {
         if read_opts.inner.is_null() {
-            return Err(Error::new("Unable to create RocksDB read options. \
+            return Err(Error::new(
+                "Unable to create RocksDB read options. \
                                    This is a fairly trivial call, and its \
                                    failure may be indicative of a \
                                    mis-compiled or mis-loaded RocksDB \
                                    library."
-                .to_owned()));
+                    .to_owned(),
+            ));
         }
 
         unsafe {
             let mut val_len: size_t = 0;
-            let val = ffi_try!(ffi::rocksdb_transactiondb_get(self.inner,
-                                                              read_opts.inner,
-                                                              key.as_ptr() as *const c_char,
-                                                              key.len() as size_t,
-                                                              &mut val_len)) as *mut u8;
+            let val = ffi_try!(ffi::rocksdb_transactiondb_get(
+                self.inner,
+                read_opts.inner,
+                key.as_ptr() as *const c_char,
+                key.len() as size_t,
+                &mut val_len
+            )) as *mut u8;
             if val.is_null() {
                 Ok(None)
             } else {
@@ -100,7 +112,11 @@ impl TransactionDB {
         }
     }
 
-    pub fn transaction_begin(&self, w_opts: &WriteOptions, txn_opts: &TransactionOptions) -> Transaction {
+    pub fn transaction_begin(
+        &self,
+        w_opts: &WriteOptions,
+        txn_opts: &TransactionOptions,
+    ) -> Transaction {
         Transaction::new(self, w_opts, txn_opts)
     }
 
@@ -116,9 +132,7 @@ impl Default for TransactionDBOptions {
             if transaction_db_options.is_null() {
                 panic!("Couldn't create Transaction RocksDB options");
             }
-            Self {
-                inner: transaction_db_options
-            }
+            Self { inner: transaction_db_options }
         }
     }
 }

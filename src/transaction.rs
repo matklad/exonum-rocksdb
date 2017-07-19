@@ -1,38 +1,46 @@
-use std::ptr::null_mut;
+use super::{TransactionDB, WriteOptions, Error, DBVector, ReadOptions};
+use ffi;
 
 use libc::{self, c_char, c_int, c_uchar, c_void, size_t};
-use ffi;
-use super::{TransactionDB, WriteOptions, Error, DBVector, ReadOptions};
+use std::ptr::null_mut;
 
 pub struct Transaction {
-    inner: *mut ffi::rocksdb_transaction_t
+    inner: *mut ffi::rocksdb_transaction_t,
 }
 
 
 pub struct TransactionOptions {
-    inner: *mut ffi::rocksdb_transaction_options_t
+    inner: *mut ffi::rocksdb_transaction_options_t,
 }
 
 
 impl Transaction {
-    pub fn new(db: &TransactionDB, 
-               options: &WriteOptions, 
-               txn_options: &TransactionOptions) 
-               -> Self {
+    pub fn new(
+        db: &TransactionDB,
+        options: &WriteOptions,
+        txn_options: &TransactionOptions,
+    ) -> Self {
         unsafe {
             Transaction {
-                inner: ffi::rocksdb_transaction_begin(db.inner, options.inner, txn_options.inner, null_mut())
+                inner: ffi::rocksdb_transaction_begin(
+                    db.inner,
+                    options.inner,
+                    txn_options.inner,
+                    null_mut(),
+                ),
             }
         }
     }
 
     pub fn put(&self, key: &[u8], value: &[u8]) -> Result<(), Error> {
         unsafe {
-            ffi_try!(ffi::rocksdb_transaction_put(self.inner, 
-                                         key.as_ptr() as *const c_char,
-                                         key.len() as size_t,
-                                         value.as_ptr() as *const c_char,
-                                         value.len() as size_t));
+            ffi_try!(ffi::rocksdb_transaction_put(
+                self.inner,
+                key.as_ptr() as *const c_char,
+                key.len() as size_t,
+                value.as_ptr() as *const c_char,
+                value.len() as size_t
+            ));
             Ok(())
         }
     }
@@ -44,21 +52,25 @@ impl Transaction {
 
     pub fn get_opt(&self, key: &[u8], read_opts: &ReadOptions) -> Result<Option<DBVector>, Error> {
         if read_opts.inner.is_null() {
-            return Err(Error::new("Unable to create RocksDB read options. \
+            return Err(Error::new(
+                "Unable to create RocksDB read options. \
                                    This is a fairly trivial call, and its \
                                    failure may be indicative of a \
                                    mis-compiled or mis-loaded RocksDB \
                                    library."
-                .to_owned()));
+                    .to_owned(),
+            ));
         }
 
         unsafe {
             let mut val_len: size_t = 0;
-            let val = ffi_try!(ffi::rocksdb_transaction_get(self.inner,
-                                                            read_opts.inner,
-                                                            key.as_ptr() as *const c_char,
-                                                            key.len() as size_t,
-                                                            &mut val_len)) as *mut u8;
+            let val = ffi_try!(ffi::rocksdb_transaction_get(
+                self.inner,
+                read_opts.inner,
+                key.as_ptr() as *const c_char,
+                key.len() as size_t,
+                &mut val_len
+            )) as *mut u8;
             if val.is_null() {
                 Ok(None)
             } else {
@@ -90,14 +102,10 @@ impl Drop for Transaction {
     }
 }
 
-impl TransactionOptions {
-    
-}
+impl TransactionOptions {}
 
 impl Default for TransactionOptions {
     fn default() -> Self {
-        TransactionOptions {
-            inner: unsafe { ffi::rocksdb_transaction_options_create() }
-        }
+        TransactionOptions { inner: unsafe { ffi::rocksdb_transaction_options_create() } }
     }
 }
