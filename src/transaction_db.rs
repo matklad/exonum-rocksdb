@@ -1,19 +1,18 @@
-use super::{ColumnFamily, Options, Error, Transaction, ReadOptions, WriteOptions,
+use super::{Options, Error, Transaction, ReadOptions, WriteOptions,
             TransactionOptions, DBVector};
 use ffi;
 
-use libc::{self, c_char, c_int, c_uchar, c_void, size_t};
-use std::collections::BTreeMap;
+use libc::{c_char, size_t};
 use std::ffi::CString;
 use std::fs;
-use std::path::{Path, PathBuf};
+use std::path::Path;
 
 unsafe impl Send for TransactionDB {}
 unsafe impl Sync for TransactionDB {}
 
 pub struct TransactionDB {
     pub inner: *mut ffi::rocksdb_transactiondb_t,
-    path: PathBuf,
+    // path: PathBuf,
 }
 
 pub struct TransactionDBOptions {
@@ -29,7 +28,7 @@ impl TransactionDB {
     /// Open a transactional database with default options.
     pub fn open_default<P: AsRef<Path>>(path: P) -> Result<Self, Error> {
         let mut opts = Options::default();
-        let mut transaction_db_opts = TransactionDBOptions::default();
+        let transaction_db_opts = TransactionDBOptions::default();
         opts.create_if_missing(true);
         Self::open(&opts, &transaction_db_opts, path)
     }
@@ -74,7 +73,7 @@ impl TransactionDB {
 
         Ok(TransactionDB {
             inner: db,
-            path: path.to_path_buf(),
+            // path: path.to_path_buf(),
         })
     }
 

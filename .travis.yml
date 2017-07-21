@@ -8,6 +8,7 @@ dist: trusty
 env:
   global:
     - ROCKSDB_LIB_DIR=/usr/lib
+    - SNAPPY_LIB_DIR=/usr/lib
 before_install:
 - sudo add-apt-repository -y ppa:giskou/librocksdb
 - sudo apt-get -qq update

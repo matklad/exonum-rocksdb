@@ -1,7 +1,7 @@
 use super::{TransactionDB, WriteOptions, Error, DBVector, ReadOptions};
 use ffi;
 
-use libc::{self, c_char, c_int, c_uchar, c_void, size_t};
+use libc::{c_char, size_t};
 use std::ptr::null_mut;
 
 pub struct Transaction {
