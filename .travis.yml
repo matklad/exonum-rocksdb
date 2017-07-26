@@ -3,8 +3,8 @@ language: rust
 addons:
   apt:
     packages:
-    - gcc-5
-    - g++-5
+    - gcc
+    - g++
     - libleveldb-dev
     - libssl-dev
     - libsnappy-dev
@@ -35,8 +35,9 @@ install:
     INSTALL_PATH=$HOME/.local make -j $(nproc) install-shared
     cd ..
   fi
-- export ROCKDB_LIB_DIR=$LD_LIBRARY_PATH:$HOME/.local/lib
-- export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:$HOME/.local/lib/pkgconfig
+- export ROCKDB_LIB_DIR=$HOME/.local/lib
+- export SNAPPY_LIB_DIR=/usr/lib/x86_64-linux-gnu
+# - export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:$HOME/.local/lib/pkgconfig
 # - |
 #   if [[ "$FEATURE" == "clippy" ]]; then
 #     cargo clippy --version | grep $CLIPPY_VERS || cargo install clippy --force --vers $CLIPPY_VERS
