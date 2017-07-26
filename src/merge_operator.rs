@@ -15,14 +15,14 @@
 
 //! rustic merge operator
 //!
-//! ```rust
+//! ```ignore
 //! extern crate tempdir;
 //! extern crate rocksdb;
 //!
 //! use rocksdb::{Options, DB, MergeOperands};
 //! use tempdir::TempDir;
 //!
-//! fn concat_merge(new_key: &[u8],
+//! fn concat_merge(_: &[u8],
 //!                 existing_val: Option<&[u8]>,
 //!                 operands: &mut MergeOperands)
 //!                 -> Vec<u8> {
@@ -46,13 +46,13 @@
 //!    let path = temp_dir.path();
 //!    let mut opts = Options::default();
 //!    opts.create_if_missing(true);
-//!    opts.add_merge_operator("test operator", concat_merge);
+//!    opts.set_merge_operator("test operator", concat_merge);
 //!    let db = DB::open(&opts, path).unwrap();
-//!    let p = db.put(b"k1", b"a");
-//!    db.merge(b"k1", b"b");
-//!    db.merge(b"k1", b"c");
-//!    db.merge(b"k1", b"d");
-//!    db.merge(b"k1", b"efg");
+//!    let _ = db.put(b"k1", b"a");
+//!    let _ = db.merge(b"k1", b"b");
+//!    let _ = db.merge(b"k1", b"c");
+//!    let _ = db.merge(b"k1", b"d");
+//!    let _ = db.merge(b"k1", b"efg");
 //!    let r = db.get(b"k1");
 //!    assert!(r.unwrap().unwrap().to_utf8().unwrap() == "abcdefg");
 //! }

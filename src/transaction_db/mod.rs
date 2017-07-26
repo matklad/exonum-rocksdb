@@ -1,5 +1,7 @@
-use super::{Options, Error, Transaction, ReadOptions, WriteOptions,
-            TransactionOptions, DBVector};
+
+pub use self::transaction::{Transaction, TransactionOptions};
+use db::{Inner, DBIterator, DBRawIterator, IteratorMode};
+use super::{Options, Error, ReadOptions, WriteOptions, DBVector};
 use ffi;
 
 use libc::{c_char, size_t};
@@ -9,6 +11,8 @@ use std::path::Path;
 
 unsafe impl Send for TransactionDB {}
 unsafe impl Sync for TransactionDB {}
+
+pub mod transaction;
 
 pub struct TransactionDB {
     pub inner: *mut ffi::rocksdb_transactiondb_t,
@@ -82,6 +86,25 @@ impl TransactionDB {
         self.get_opt(key, &opts)
     }
 
+    pub fn put(&self, key: &[u8], value: &[u8]) -> Result<(), Error> {
+        let w_opts = WriteOptions::default();
+        self.put_opt(key, value, &w_opts)
+    }
+
+    pub fn put_opt(&self, key: &[u8], value: &[u8], w_opts: &WriteOptions) -> Result<(), Error> {
+        unsafe {
+            ffi_try!(ffi::rocksdb_transactiondb_put(
+                self.inner,
+                w_opts.inner,
+                key.as_ptr() as *const c_char,
+                key.len() as size_t,
+                value.as_ptr() as *const c_char,
+                value.len() as size_t
+            ));
+            Ok(())
+        }
+    }
+
     pub fn get_opt(&self, key: &[u8], read_opts: &ReadOptions) -> Result<Option<DBVector>, Error> {
         if read_opts.inner.is_null() {
             return Err(Error::new(
@@ -122,17 +145,21 @@ impl TransactionDB {
     pub fn snapshot(&self) -> Snapshot {
         Snapshot::new(self)
     }
-}
 
-impl Default for TransactionDBOptions {
-    fn default() -> Self {
+    pub fn destroy<P: AsRef<Path>>(opts: &Options, path: P) -> Result<(), Error> {
+        let cpath = CString::new(path.as_ref().to_string_lossy().as_bytes()).unwrap();
         unsafe {
-            let transaction_db_options = ffi::rocksdb_transactiondb_options_create();
-            if transaction_db_options.is_null() {
-                panic!("Couldn't create Transaction RocksDB options");
-            }
-            Self { inner: transaction_db_options }
+            ffi_try!(ffi::rocksdb_destroy_db(opts.inner, cpath.as_ptr()));
         }
+        Ok(())
+    }
+
+    pub fn repair<P: AsRef<Path>>(opts: Options, path: P) -> Result<(), Error> {
+        let cpath = CString::new(path.as_ref().to_string_lossy().as_bytes()).unwrap();
+        unsafe {
+            ffi_try!(ffi::rocksdb_repair_db(opts.inner, cpath.as_ptr()));
+        }
+        Ok(())
     }
 }
 
@@ -153,29 +180,65 @@ impl<'a> Snapshot<'a> {
         }
     }
 
-    // pub fn iterator(&self, mode: IteratorMode) -> DBIterator {
-    //     let mut readopts = ReadOptions::default();
-    //     readopts.set_snapshot(self);
-    //     DBIterator::new(self.db, &readopts, mode)
-    // }
+    pub fn iterator(&self, mode: IteratorMode) -> DBIterator {
+        let mut readopts = ReadOptions::default();
+        let writeopts = WriteOptions::default();
+        let txn_opts = TransactionOptions::default();
+        let txn = self.db.transaction_begin(&writeopts, &txn_opts);
+        readopts.set_snapshot(self);
+        DBIterator::new_txn(&txn, &readopts, mode)
+    }
 
-    // pub fn raw_iterator(&self) -> DBRawIterator {
-    //     let mut readopts = ReadOptions::default();
-    //     readopts.set_snapshot(self);
-    //     DBRawIterator::new(self.db, &readopts)
-    // }
+    pub fn raw_iterator(&self) -> DBRawIterator {
+        let mut readopts = ReadOptions::default();
+        let writeopts = WriteOptions::default();
+        let txn_opts = TransactionOptions::default();
+        let txn = self.db.transaction_begin(&writeopts, &txn_opts);
+        readopts.set_snapshot(self);
+        DBRawIterator::new_txn(&txn, &readopts)
+    }
 
-    // pub fn get(&self, key: &[u8]) -> Result<Option<DBVector>, Error> {
-    //     let mut readopts = ReadOptions::default();
-    //     readopts.set_snapshot(self);
-    //     self.db.get_opt(key, &readopts)
-    // }
+    pub fn get(&self, key: &[u8]) -> Result<Option<DBVector>, Error> {
+        let mut readopts = ReadOptions::default();
+        readopts.set_snapshot(self);
+        self.db.get_opt(key, &readopts)
+    }
 }
 
 impl<'a> Drop for Snapshot<'a> {
     fn drop(&mut self) {
         unsafe {
             ffi::rocksdb_transactiondb_release_snapshot(self.db.inner, self.inner);
+        }
+    }
+}
+
+impl<'a> Inner for Snapshot<'a> {
+    fn get_inner(&self) -> *const ffi::rocksdb_snapshot_t {
+        self.inner
+    }
+}
+
+impl TransactionDBOptions {
+
+}
+
+impl Default for TransactionDBOptions {
+    fn default() -> Self {
+        unsafe {
+            let transaction_db_options = ffi::rocksdb_transactiondb_options_create();
+            if transaction_db_options.is_null() {
+                panic!("Couldn't create Transaction RocksDB options");
+            }
+            Self { inner: transaction_db_options }
+        }
+    }
+}
+
+impl Drop for TransactionDBOptions {
+    fn drop(&mut self) {
+        unsafe {
+            ffi::rocksdb_transactiondb_options_destroy(self.inner);
         }
     }
 }

@@ -20,7 +20,7 @@ use compaction_filter::{self, CompactionFilterCallback, CompactionFilterFn, filt
 use comparator::{self, ComparatorCallback, CompareFn};
 use ffi;
 
-use libc::{self, c_int, c_uchar, c_uint, c_void, size_t, uint64_t};
+use libc::{c_int, c_uchar, c_uint, c_void, size_t, uint64_t};
 use merge_operator::{self, MergeFn, MergeOperatorCallback, full_merge_callback,
                      partial_merge_callback};
 use std::ffi::{CStr, CString};
@@ -835,7 +835,7 @@ impl Options {
 
             // Must have valid UTF-8 format.
             let s = CStr::from_ptr(value).to_str().unwrap().to_owned();
-            libc::free(value as *mut c_void);
+            ffi::rocksdb_free(value as *mut c_void);
             Some(s)
         }
     }

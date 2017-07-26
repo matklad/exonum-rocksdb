@@ -941,14 +941,12 @@ extern "C" {
 
     pub fn rocksdb_free(ptr: *mut c_void);
 
-    // Transactions
+    // Transactions DB
 
     pub fn rocksdb_transactiondb_open(options: *const rocksdb_options_t,
                                       txn_db_options: *const rocksdb_transactiondb_options_t,
                                       name: *const c_char,
                                       errptr: *mut *mut c_char) -> *mut rocksdb_transactiondb_t;
-
-    pub fn rocksdb_transactiondb_options_create() -> *mut rocksdb_transactiondb_options_t;
 
     pub fn rocksdb_transactiondb_close(db: *mut rocksdb_transactiondb_t);
 
@@ -958,6 +956,10 @@ extern "C" {
     pub fn rocksdb_transactiondb_release_snapshot(txn_db: *mut rocksdb_transactiondb_t,
                                                   snapshot: *const rocksdb_snapshot_t);
 
+    pub fn rocksdb_transactiondb_checkpoint_object_create(txn_db: *mut rocksdb_transactiondb_t,
+                                                          errptr: *mut *mut c_char) 
+                                                          -> *mut rocksdb_checkpoint_t; 
+
     pub fn rocksdb_transactiondb_get(txn_db: *mut rocksdb_transactiondb_t,
                                      options: *const rocksdb_readoptions_t,
                                      key: *const c_char,
@@ -965,14 +967,31 @@ extern "C" {
                                      vallen: *mut size_t,
                                      errptr: *mut *mut c_char) -> *mut c_char;
 
+    pub fn rocksdb_transactiondb_put(txn_db: *mut rocksdb_transactiondb_t,
+                                     options: *const rocksdb_writeoptions_t,
+                                     key: *const c_char,
+                                     keylen: size_t,
+                                     value: *const c_char,
+                                     vallen: size_t,
+                                     errptr: *mut *mut c_char);
 
-    pub fn rocksdb_transaction_options_create() -> *mut rocksdb_transaction_options_t;
+    pub fn rocksdb_transactiondb_delete(txn_db: *mut rocksdb_transactiondb_t,
+                                        options: *const rocksdb_writeoptions_t,
+                                        key: *const c_char,
+                                        keylen: size_t,
+                                        errptr: *mut *mut c_char);
+
+    // Transaction
 
     pub fn rocksdb_transaction_begin(txn_db: *mut rocksdb_transactiondb_t,
                                      options: *const rocksdb_writeoptions_t,
                                      txn_options: *const rocksdb_transaction_options_t,
                                      old_txn: *mut rocksdb_transaction_t) 
                                      -> *mut rocksdb_transaction_t;
+
+    pub fn rocksdb_transaction_create_iterator(txn: *mut rocksdb_transaction_t,
+                                               opts: *const rocksdb_readoptions_t) 
+                                               -> *mut rocksdb_iterator_t;
 
     pub fn rocksdb_transaction_put(txn: *mut rocksdb_transaction_t,
                                    key: *const c_char,
@@ -988,13 +1007,58 @@ extern "C" {
                                    vallen: *mut size_t,
                                    errptr: *mut *mut c_char) -> *mut c_char;
 
+    pub fn rocksdb_transaction_delete(txn: *mut rocksdb_transaction_t,
+                                      key: *const c_char,
+                                      keylen: size_t,
+                                      errptr: *mut *mut c_char);
+
     pub fn rocksdb_transaction_commit(txn: *mut rocksdb_transaction_t, errptr: *mut *mut c_char);
 
     pub fn rocksdb_transaction_rollback(txn: *mut rocksdb_transaction_t, errptr: *mut *mut c_char);
 
     pub fn rocksdb_transaction_destroy(txn: *mut rocksdb_transaction_t);
 
+    // TransactionDB Options
 
+    pub fn rocksdb_transactiondb_options_create() -> *mut rocksdb_transactiondb_options_t;
+
+    pub fn rocksdb_transactiondb_options_destroy(txn_db_options: *mut rocksdb_transactiondb_options_t);
+
+    pub fn rocksdb_transactiondb_options_set_max_num_locks(opts: *mut rocksdb_transactiondb_options_t,
+                                                           max_num_locks: int64_t);
+
+    pub fn rocksdb_transactiondb_options_set_num_stripes(opts: *mut rocksdb_transactiondb_options_t,
+                                                         num_stripes: size_t);
+
+    pub fn rocksdb_transactiondb_options_set_transaction_lock_timeout(opts: *mut rocksdb_transactiondb_options_t,
+                                                                      txn_lock_timeout: int64_t);
+
+    pub fn rocksdb_transactiondb_options_set_default_lock_timeout(opts: *mut rocksdb_transactiondb_options_t,
+                                                                  default_lock_timeout: int64_t);
+
+    // Transaction Options
+
+    pub fn rocksdb_transaction_options_create() -> *mut rocksdb_transaction_options_t;
+
+    pub fn rocksdb_transaction_options_destroy(opts: *mut rocksdb_transaction_options_t);
+
+    pub fn rocksdb_transaction_options_set_set_snapshot(opts: *mut rocksdb_transaction_options_t,
+                                                        v: c_uchar);
+
+    pub fn rocksdb_transaction_options_set_deadlock_detect(opts: *mut rocksdb_transaction_options_t, 
+                                                           v: c_uchar);
+
+    pub fn rocksdb_transaction_options_set_lock_timeout(opts: *mut rocksdb_transaction_options_t,
+                                                        lock_timeout: int64_t);
+
+    pub fn rocksdb_transaction_options_set_expiration(opts: *mut rocksdb_transaction_options_t, 
+                                                      expiration: int64_t);
+
+    pub fn rocksdb_transaction_options_set_deadlock_detect_depth(opts: *mut rocksdb_transaction_options_t,
+                                                                 depth: int64_t);
+
+    pub fn rocksdb_transaction_options_set_max_write_batch_size(opts: *mut rocksdb_transaction_options_t,
+                                                                size: size_t);
 }
 
 pub const rocksdb_block_based_table_index_type_binary_search: c_int = 0;
@@ -1088,3 +1152,5 @@ pub enum rocksdb_transactiondb_t { }
 pub enum rocksdb_transaction_options_t { }
 
 pub enum rocksdb_transaction_t { }
+
+pub enum rocksdb_checkpoint_t { }

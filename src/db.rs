@@ -15,10 +15,11 @@
 
 
 use {DB, Error, Options, WriteOptions, ColumnFamily};
+use transaction_db::Transaction;
 use ffi;
 use ffi_util::opt_bytes_to_ptr;
 
-use libc::{self, c_char, c_int, c_uchar, c_void, size_t};
+use libc::{c_char, c_int, c_uchar, c_void, size_t};
 use std::collections::BTreeMap;
 use std::ffi::CString;
 use std::fmt;
@@ -29,12 +30,18 @@ use std::ptr;
 use std::slice;
 use std::str;
 
+
 pub fn new_bloom_filter(bits: c_int) -> *mut ffi::rocksdb_filterpolicy_t {
     unsafe { ffi::rocksdb_filterpolicy_create_bloom(bits) }
 }
 
 unsafe impl Send for DB {}
 unsafe impl Sync for DB {}
+
+pub trait Inner {
+    fn get_inner(&self) -> *const ffi::rocksdb_snapshot_t;
+}
+
 
 #[derive(Debug, Copy, Clone, PartialEq)]
 pub enum DBCompressionType {
@@ -216,6 +223,10 @@ pub enum IteratorMode<'a> {
 impl DBRawIterator {
     fn new(db: &DB, readopts: &ReadOptions) -> DBRawIterator {
         unsafe { DBRawIterator { inner: ffi::rocksdb_create_iterator(db.inner, readopts.inner) } }
+    }
+
+    pub fn new_txn(txn: &Transaction, readopts: &ReadOptions) -> DBRawIterator {
+        unsafe { DBRawIterator { inner: ffi::rocksdb_transaction_create_iterator(txn.inner, readopts.inner) } }
     }
 
     fn new_cf(
@@ -484,6 +495,16 @@ impl DBIterator {
         rv
     }
 
+    pub fn new_txn(txn: &Transaction, readopts: &ReadOptions, mode: IteratorMode) -> DBIterator {
+        let mut rv = DBIterator {
+            raw: DBRawIterator::new_txn(txn, readopts),
+            direction: Direction::Forward, // blown away by set_mode()
+            just_seeked: false,
+        };
+        rv.set_mode(mode);
+        rv
+    }
+
     fn new_cf(
         db: &DB,
         cf_handle: ColumnFamily,
@@ -566,6 +587,10 @@ impl<'a> Snapshot<'a> {
         }
     }
 
+    // pub fn new_txn(db: &T) -> Snapshot {
+    //     let snapshot = unsafe {  };
+    // }
+
     pub fn iterator(&self, mode: IteratorMode) -> DBIterator {
         let mut readopts = ReadOptions::default();
         readopts.set_snapshot(self);
@@ -612,6 +637,12 @@ impl<'a> Drop for Snapshot<'a> {
         unsafe {
             ffi::rocksdb_release_snapshot(self.db.inner, self.inner);
         }
+    }
+}
+
+impl<'a> Inner for Snapshot<'a> {
+    fn get_inner(&self) -> *const ffi::rocksdb_snapshot_t {
+        self.inner
     }
 }
 
@@ -1200,9 +1231,9 @@ impl ReadOptions {
         }
     }
 
-    fn set_snapshot(&mut self, snapshot: &Snapshot) {
+    pub fn set_snapshot<T: Inner>(&mut self, snapshot: &T) {
         unsafe {
-            ffi::rocksdb_readoptions_set_snapshot(self.inner, snapshot.inner);
+            ffi::rocksdb_readoptions_set_snapshot(self.inner, snapshot.get_inner());
         }
     }
 
@@ -1244,7 +1275,7 @@ impl Deref for DBVector {
 impl Drop for DBVector {
     fn drop(&mut self) {
         unsafe {
-            libc::free(self.base as *mut c_void);
+            ffi::rocksdb_free(self.base as *mut c_void);
         }
     }
 }
@@ -1282,8 +1313,9 @@ impl DBVector {
 #[test]
 fn test_db_vector() {
     use std::mem;
+    use libc::calloc;
     let len: size_t = 4;
-    let data: *mut u8 = unsafe { mem::transmute(libc::calloc(len, mem::size_of::<u8>())) };
+    let data: *mut u8 = unsafe { mem::transmute(calloc(len, mem::size_of::<u8>())) };
     let v = unsafe { DBVector::from_c(data, len) };
     let ctrl = [0u8, 0, 0, 0];
     assert_eq!(&*v, &ctrl[..]);
