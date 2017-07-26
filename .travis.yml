@@ -27,6 +27,8 @@ env:
   global:
   - CLIPPY_VERS=0.0.142
   - RUSTFMT_VERS=0.9.0
+  - GCC_VERSION=5
+  - CPP=11
 
 install:
 - |
