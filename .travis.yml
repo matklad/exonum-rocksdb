@@ -3,14 +3,12 @@ language: rust
 addons:
   apt:
     packages:
-    - gcc-5
-    - g++-5
+    - gcc
+    - g++
     - libleveldb-dev
     - libssl-dev
     - libsnappy-dev
-    sources:
-    - ubuntu-toolchain-r-test
-
+ 
 rust:
 - stable
 
@@ -34,11 +32,10 @@ install:
     wget -O rocksdb-5.6.1.tar.gz https://github.com/facebook/rocksdb/archive/v5.6.1.tar.gz
     tar xvf rocksdb-5.6.1.tar.gz
     cd rocksdb-5.6.1
-    export CXX=g++-5
     INSTALL_PATH=$HOME/.local make install-shared
     cd ..
   fi
-- export ROCKDB_LIB_DIR=$HOME/.local/lib
+- export ROCKSDB_LIB_DIR=$HOME/.local/lib
 - export SNAPPY_LIB_DIR=/usr/lib/x86_64-linux-gnu
 # - export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:$HOME/.local/lib/pkgconfig
 # - |
