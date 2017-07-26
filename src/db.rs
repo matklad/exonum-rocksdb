@@ -587,10 +587,6 @@ impl<'a> Snapshot<'a> {
         }
     }
 
-    // pub fn new_txn(db: &T) -> Snapshot {
-    //     let snapshot = unsafe {  };
-    // }
-
     pub fn iterator(&self, mode: IteratorMode) -> DBIterator {
         let mut readopts = ReadOptions::default();
         readopts.set_snapshot(self);
