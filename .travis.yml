@@ -35,7 +35,7 @@ install:
     tar xvf rocksdb-5.6.1.tar.gz
     cd rocksdb-5.6.1
     export CXX=g++-5
-    INSTALL_PATH=$HOME/.local make -j $(nproc) install-shared
+    INSTALL_PATH=$HOME/.local make install-shared
     cd ..
   fi
 - export ROCKDB_LIB_DIR=$HOME/.local/lib
