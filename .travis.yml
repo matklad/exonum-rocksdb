@@ -76,6 +76,8 @@ jobs:
   #   script:
   #   - cd sandbox_tests && cargo clippy -- -D warnings
   - stage: check
+    env:
+    - ROCKSDB_LIB_DIR=$HOME/.local/lib
     script:
     - ls -la $ROCKSDB_LIB_DIR
   - stage: test
