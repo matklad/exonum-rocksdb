@@ -32,7 +32,7 @@ install:
     wget -O rocksdb-5.6.1.tar.gz https://github.com/facebook/rocksdb/archive/v5.6.1.tar.gz
     tar xvf rocksdb-5.6.1.tar.gz
     cd rocksdb-5.6.1
-    INSTALL_PATH=$HOME/.local make -j($nproc) install-shared
+    INSTALL_PATH=$HOME/.local make -j $(nproc) install-shared
     cd ..
   fi
 - export ROCKDB_LIB_DIR=$LD_LIBRARY_PATH:$HOME/.local/lib
