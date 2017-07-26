@@ -4,6 +4,7 @@ use rocksdb::{TransactionDB, Options, WriteOptions, TransactionOptions};
 
 fn main() {
     let path = "/tmp/rookkkss";
+    
     {
         let db = TransactionDB::open_default(path).unwrap();
         let _ = db.put(b"key1", b"value1");
@@ -17,8 +18,8 @@ fn main() {
                 String::from_utf8(value.to_vec()).unwrap());
         }
     }
-    match TransactionDB::destroy(&Options::default(), path) {
-        Ok(()) => println!("db destroyed successfyly"),
-        Err(e) => println!("Error destroying db: {}", e),
+
+    if let Err(e) =  TransactionDB::destroy(&Options::default(), path) {
+        println!("Error destroying db: {}", e);
     }
 }

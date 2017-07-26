@@ -3,11 +3,13 @@ language: rust
 addons:
   apt:
     packages:
-    - gcc
-    - g++
+    - gcc-5
+    - g++-5
     - libleveldb-dev
     - libssl-dev
     - libsnappy-dev
+    sources:
+    - ubuntu-toolchain-r-test
 
 rust:
 - stable
