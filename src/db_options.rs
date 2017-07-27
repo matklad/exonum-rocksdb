@@ -20,7 +20,7 @@ use compaction_filter::{self, CompactionFilterCallback, CompactionFilterFn, filt
 use comparator::{self, ComparatorCallback, CompareFn};
 use ffi;
 
-use libc::{self, c_int, c_uchar, c_uint, c_void, size_t, uint64_t};
+use libc::{c_int, c_uchar, c_uint, c_void, size_t, uint64_t};
 use merge_operator::{self, MergeFn, MergeOperatorCallback, full_merge_callback,
                      partial_merge_callback};
 use std::ffi::{CStr, CString};
@@ -355,43 +355,6 @@ impl Options {
     pub fn set_bytes_per_sync(&mut self, nbytes: u64) {
         unsafe {
             ffi::rocksdb_options_set_bytes_per_sync(self.inner, nbytes);
-        }
-    }
-
-    pub fn set_disable_data_sync(&mut self, disable: bool) {
-        unsafe { ffi::rocksdb_options_set_disable_data_sync(self.inner, disable as c_int) }
-    }
-
-    /// Hints to the OS that it should not buffer disk I/O. Enabling this
-    /// parameter may improve performance but increases pressure on the
-    /// system cache.
-    ///
-    /// The exact behavior of this parameter is platform dependent.
-    ///
-    /// On POSIX systems, after RocksDB reads data from disk it will
-    /// mark the pages as "unneeded". The operating system may - or may not
-    /// - evict these pages from memory, reducing pressure on the system
-    /// cache. If the disk block is requested again this can result in
-    /// additional disk I/O.
-    ///
-    /// On WINDOWS systems, files will be opened in "unbuffered I/O" mode
-    /// which means that data read from the disk will not be cached or
-    /// bufferized. The hardware buffer of the devices may however still
-    /// be used. Memory mapped files are not impacted by this parameter.
-    ///
-    /// Default: true
-    ///
-    /// # Example
-    ///
-    /// ```ignore
-    /// use rocksdb::Options;
-    ///
-    /// let mut opts = Options::default();
-    /// opts.set_allow_os_buffer(false);
-    /// ```
-    pub fn set_allow_os_buffer(&mut self, is_allow: bool) {
-        unsafe {
-            ffi::rocksdb_options_set_allow_os_buffer(self.inner, is_allow as c_uchar);
         }
     }
 
@@ -835,7 +798,7 @@ impl Options {
 
             // Must have valid UTF-8 format.
             let s = CStr::from_ptr(value).to_str().unwrap().to_owned();
-            libc::free(value as *mut c_void);
+            ffi::rocksdb_free(value as *mut c_void);
             Some(s)
         }
     }

@@ -27,9 +27,9 @@
 //!  # fn main() {
 //!  let temp_dir = TempDir::new("storage").unwrap();
 //!  let db = DB::open_default(temp_dir.path()).unwrap();
-//!  db.put(b"my key", b"my value");
+//!  let _ = db.put(b"my key", b"my value");
 //!  match db.get(b"my key") {
-//!     Ok(Some(value)) => println!("retrieved value {}", value.to_utf8().unwrap()),
+//!     Ok(Some(value)) => println!("retrieved value {}", &value.to_utf8().unwrap()),
 //!     Ok(None) => println!("value not found"),
 //!     Err(e) => println!("operational problem encountered: {}", e),
 //!  }
@@ -52,7 +52,6 @@ pub mod compaction_filter;
 mod db;
 mod db_options;
 mod transaction_db;
-mod transaction;
 
 pub use compaction_filter::Decision as CompactionDecision;
 pub use db::{DBCompactionStyle, DBCompressionType, DBIterator, DBRawIterator, DBRecoveryMode,
@@ -64,9 +63,9 @@ use std::collections::BTreeMap;
 use std::error;
 use std::fmt;
 use std::path::PathBuf;
-pub use transaction::{Transaction, TransactionOptions};
-
 pub use transaction_db::{TransactionDB, TransactionDBOptions};
+
+pub use transaction_db::transaction::{Transaction, TransactionOptions};
 
 /// A RocksDB database.
 ///
@@ -140,7 +139,6 @@ pub struct BlockBasedOptions {
 ///    opts.set_max_open_files(10000);
 ///    opts.set_use_fsync(false);
 ///    opts.set_bytes_per_sync(8388608);
-///    opts.set_disable_data_sync(false);
 ///    opts.optimize_for_point_lookup(1024);
 ///    opts.set_table_cache_num_shard_bits(6);
 ///    opts.set_max_write_buffer_number(32);

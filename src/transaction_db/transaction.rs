@@ -1,11 +1,13 @@
-use super::{TransactionDB, WriteOptions, Error, DBVector, ReadOptions};
+use super::{WriteOptions, Error, DBVector, ReadOptions};
+use super::TransactionDB;
+use db::{DBIterator, IteratorMode};
 use ffi;
 
 use libc::{c_char, size_t};
 use std::ptr::null_mut;
 
 pub struct Transaction {
-    inner: *mut ffi::rocksdb_transaction_t,
+    pub inner: *mut ffi::rocksdb_transaction_t,
 }
 
 
@@ -91,6 +93,15 @@ impl Transaction {
             ffi_try!(ffi::rocksdb_transaction_rollback(self.inner));
             Ok(())
         }
+    }
+
+    pub fn iterator(&self) -> DBIterator {
+        let opts = ReadOptions::default();
+        self.iterator_opt(&opts)
+    }
+
+    pub fn iterator_opt(&self, opts: &ReadOptions) -> DBIterator {
+        DBIterator::new_txn(self, &opts, IteratorMode::Start)
     }
 }
 
