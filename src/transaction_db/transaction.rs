@@ -81,6 +81,17 @@ impl Transaction {
         }
     }
 
+    pub fn delete(&self, key: &[u8]) -> Result<(), Error> {
+        unsafe {
+            ffi_try!(ffi::rocksdb_transaction_delete(
+                self.inner,
+                key.as_ptr() as *const c_char,
+                key.len() as size_t
+            ));
+            Ok(())
+        }
+    }
+
     pub fn commit(&self) -> Result<(), Error> {
         unsafe {
             ffi_try!(ffi::rocksdb_transaction_commit(self.inner));
