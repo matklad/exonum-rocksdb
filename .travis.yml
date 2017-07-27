@@ -35,7 +35,8 @@ install:
     INSTALL_PATH=$HOME/.local make install-shared
     cd ..
   fi
-# - export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:$HOME/.local/lib/pkgconfig
+- export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$HOME/.local/lib
+- export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:$HOME/.local/lib/pkgconfig
 # - |
 #   if [[ "$FEATURE" == "clippy" ]]; then
 #     cargo clippy --version | grep $CLIPPY_VERS || cargo install clippy --force --vers $CLIPPY_VERS
@@ -75,11 +76,6 @@ jobs:
   #   - SANDBOX=1
   #   script:
   #   - cd sandbox_tests && cargo clippy -- -D warnings
-  - stage: check
-    env:
-    - ROCKSDB_LIB_DIR=$HOME/.local/lib
-    script:
-    - ls -la $ROCKSDB_LIB_DIR
   - stage: test
     env:
     - ROCKSDB_LIB_DIR=$HOME/.local/lib
