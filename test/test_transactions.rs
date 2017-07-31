@@ -1,4 +1,4 @@
-use rocksdb::{TransactionDB, WriteOptions, TransactionOptions, IteratorMode, Options};
+use exonum_rocksdb::{TransactionDB, WriteOptions, TransactionOptions, IteratorMode, Options};
 use tempdir::TempDir;
 
 #[test]
@@ -18,7 +18,10 @@ fn test_transactiondb_commit() {
     let txn_opts = TransactionOptions::default();
     let txn = db.transaction_begin(&w_opts, &txn_opts);
     assert!(txn.put(b"key1", b"value1").is_ok());
+    assert!(txn.put(b"key2", b"value2").is_ok());
     assert!(txn.get(b"key1").unwrap().is_some());
+    assert!(txn.delete(b"key2").is_ok());
+    assert!(txn.get(b"key2").unwrap().is_none());
     assert!(txn.commit().is_ok());
     assert_eq!(db.get(b"key1").unwrap().unwrap().to_utf8(), Some("value1"));
 }

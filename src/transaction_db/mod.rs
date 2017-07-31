@@ -134,6 +134,8 @@ impl TransactionDB {
         }
     }
 
+    
+
     pub fn transaction_begin(
         &self,
         w_opts: &WriteOptions,

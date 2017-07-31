@@ -13,7 +13,7 @@
 // limitations under the License.
 //
 
-use rocksdb::{DB, MergeOperands, Options};
+use exonum_rocksdb::{DB, MergeOperands, Options};
 use tempdir::TempDir;
 
 #[test]
