@@ -13,7 +13,7 @@
 // limitations under the License.
 //
 
-use rocksdb::{DB, Direction, IteratorMode, Options};
+use exonum_rocksdb::{DB, Direction, IteratorMode, Options};
 
 fn cba(input: &Box<[u8]>) -> Box<[u8]> {
     input.iter().cloned().collect::<Vec<_>>().into_boxed_slice()

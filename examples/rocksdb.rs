@@ -1,6 +1,6 @@
-extern crate rocksdb;
+extern crate exonum_rocksdb;
 
-use rocksdb::{TransactionDB, Options, WriteOptions, TransactionOptions};
+use exonum_rocksdb::{TransactionDB, Options, WriteOptions, TransactionOptions};
 
 fn main() {
     let path = "/tmp/rookkkss";

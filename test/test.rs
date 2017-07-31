@@ -13,7 +13,7 @@
 // limitations under the License.
 //
 
-extern crate rocksdb;
+extern crate exonum_rocksdb;
 extern crate tempdir;
 
 mod test_iterator;

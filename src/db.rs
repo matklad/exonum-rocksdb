@@ -74,9 +74,9 @@ pub enum DBRecoveryMode {
 ///
 /// ```rust
 /// extern crate tempdir;
-/// extern crate rocksdb;
+/// extern crate exonum_rocksdb;
 ///
-/// use rocksdb::{DB, WriteBatch};
+/// use exonum_rocksdb::{DB, WriteBatch};
 /// use tempdir::TempDir;
 /// # fn main() {
 /// let temp_dir = TempDir::new("storage1").unwrap();
@@ -102,9 +102,9 @@ pub struct ReadOptions {
 ///
 /// ```rust
 /// extern crate tempdir;
-/// extern crate rocksdb;
+/// extern crate exonum_rocksdb;
 ///
-/// use rocksdb::{DB, IteratorMode};
+/// use exonum_rocksdb::{DB, IteratorMode};
 /// use tempdir::TempDir;
 ///
 /// # fn main() {
@@ -130,9 +130,9 @@ pub struct Snapshot<'a> {
 ///
 /// ```rust
 /// extern crate tempdir;
-/// extern crate rocksdb;
+/// extern crate exonum_rocksdb;
 ///
-/// use rocksdb::DB;
+/// use exonum_rocksdb::DB;
 /// use tempdir::TempDir;
 ///
 /// # fn main() {
@@ -172,9 +172,9 @@ pub struct DBRawIterator {
 ///
 /// ```rust
 /// extern crate tempdir;
-/// extern crate rocksdb;
+/// extern crate exonum_rocksdb;
 ///
-/// use rocksdb::{DB, Direction, IteratorMode};
+/// use exonum_rocksdb::{DB, Direction, IteratorMode};
 /// use tempdir::TempDir;
 ///
 /// # fn main() {
@@ -251,10 +251,10 @@ impl DBRawIterator {
     /// # Examples
     ///
     /// ```rust
-    /// extern crate rocksdb;
+    /// extern crate exonum_rocksdb;
     /// extern crate tempdir;
     ///
-    /// use rocksdb::DB;
+    /// use exonum_rocksdb::DB;
     /// use tempdir::TempDir;
     ///
     /// # fn main() {
@@ -294,10 +294,10 @@ impl DBRawIterator {
     /// # Examples
     ///
     /// ```rust
-    /// extern crate rocksdb;
+    /// extern crate exonum_rocksdb;
     /// extern crate tempdir;
     ///
-    /// use rocksdb::DB;
+    /// use exonum_rocksdb::DB;
     /// use tempdir::TempDir;
     ///
     /// # fn main() {
@@ -340,10 +340,10 @@ impl DBRawIterator {
     /// # Examples
     ///
     /// ```rust
-    /// extern crate rocksdb;
+    /// extern crate exonum_rocksdb;
     /// extern crate tempdir;
     ///
-    /// use rocksdb::DB;
+    /// use exonum_rocksdb::DB;
     /// use tempdir::TempDir;
     ///
     /// # fn main() {
@@ -384,10 +384,10 @@ impl DBRawIterator {
     /// # Examples
     ///
     /// ```rust
-    /// extern crate rocksdb;
+    /// extern crate exonum_rocksdb;
     /// extern crate tempdir;
     ///
-    /// use rocksdb::DB;
+    /// use exonum_rocksdb::DB;
     /// use tempdir::TempDir;
     ///
     /// # fn main() {

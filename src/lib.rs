@@ -19,9 +19,9 @@
 //!
 //! ```rust
 //!  extern crate tempdir;
-//!  extern crate rocksdb;
+//!  extern crate exonum_rocksdb;
 //!
-//!  use rocksdb::DB;
+//!  use exonum_rocksdb::DB;
 //!  use tempdir::TempDir;
 //!  // NB: db is automatically closed at end of lifetime
 //!  # fn main() {
@@ -129,8 +129,8 @@ pub struct BlockBasedOptions {
 /// # Examples
 ///
 /// ```rust
-/// use rocksdb::{Options, DB};
-/// use rocksdb::DBCompactionStyle;
+/// use exonum_rocksdb::{Options, DB};
+/// use exonum_rocksdb::DBCompactionStyle;
 ///
 /// fn badly_tuned_for_somebody_elses_disk() -> DB {
 ///    let path = "path/for/rocksdb/storageX";
@@ -167,9 +167,9 @@ pub struct Options {
 ///
 /// ```rust
 /// extern crate tempdir;
-/// extern crate rocksdb;
+/// extern crate exonum_rocksdb;
 ///
-/// use rocksdb::{DB, WriteBatch, WriteOptions};
+/// use exonum_rocksdb::{DB, WriteBatch, WriteOptions};
 /// use tempdir::TempDir;
 ///
 /// # fn main() {

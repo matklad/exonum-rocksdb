@@ -17,9 +17,9 @@
 //!
 //! ```ignore
 //! extern crate tempdir;
-//! extern crate rocksdb;
+//! extern crate exonum_rocksdb;
 //!
-//! use rocksdb::{Options, DB, MergeOperands};
+//! use exonum_rocksdb::{Options, DB, MergeOperands};
 //! use tempdir::TempDir;
 //!
 //! fn concat_merge(_: &[u8],

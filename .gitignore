@@ -1,6 +1,8 @@
 .vscode
+.idea
 target
 Cargo.lock
+cmake-build-debug
 *.rs.bk
 .DS_Store
 librocksdb-sys/snappy

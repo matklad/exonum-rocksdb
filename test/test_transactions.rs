@@ -1,4 +1,4 @@
-use rocksdb::{TransactionDB, WriteOptions, TransactionOptions, IteratorMode, Options};
+use exonum_rocksdb::{TransactionDB, WriteOptions, TransactionOptions, IteratorMode, Options};
 use tempdir::TempDir;
 
 #[test]

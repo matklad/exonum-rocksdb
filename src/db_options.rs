@@ -109,7 +109,7 @@ impl Options {
     /// # Example
     ///
     /// ```
-    /// use rocksdb::Options;
+    /// use exonum_rocksdb::Options;
     ///
     /// let mut opts = Options::default();
     /// opts.increase_parallelism(3);
@@ -136,7 +136,7 @@ impl Options {
     /// # Example
     ///
     /// ```
-    /// use rocksdb::Options;
+    /// use exonum_rocksdb::Options;
     ///
     /// let mut opts = Options::default();
     /// opts.create_if_missing(true);
@@ -156,7 +156,7 @@ impl Options {
     /// # Example
     ///
     /// ```
-    /// use rocksdb::{Options, DBCompressionType};
+    /// use exonum_rocksdb::{Options, DBCompressionType};
     ///
     /// let mut opts = Options::default();
     /// opts.set_compression_type(DBCompressionType::Snappy);
@@ -178,7 +178,7 @@ impl Options {
     /// # Example
     ///
     /// ```
-    /// use rocksdb::{Options, DBCompressionType};
+    /// use exonum_rocksdb::{Options, DBCompressionType};
     ///
     /// let mut opts = Options::default();
     /// opts.set_compression_per_level(&[
@@ -300,7 +300,7 @@ impl Options {
     /// # Example
     ///
     /// ```
-    /// use rocksdb::Options;
+    /// use exonum_rocksdb::Options;
     ///
     /// let mut opts = Options::default();
     /// opts.set_max_open_files(10);
@@ -321,7 +321,7 @@ impl Options {
     /// # Example
     ///
     /// ```
-    /// use rocksdb::Options;
+    /// use exonum_rocksdb::Options;
     ///
     /// let mut opts = Options::default();
     /// opts.set_use_fsync(true);
@@ -347,7 +347,7 @@ impl Options {
     /// # Example
     ///
     /// ```
-    /// use rocksdb::Options;
+    /// use exonum_rocksdb::Options;
     ///
     /// let mut opts = Options::default();
     /// opts.set_bytes_per_sync(1024 * 1024);
@@ -365,7 +365,7 @@ impl Options {
     /// # Example
     ///
     /// ```
-    /// use rocksdb::Options;
+    /// use exonum_rocksdb::Options;
     ///
     /// let mut opts = Options::default();
     /// opts.set_table_cache_num_shard_bits(4);
@@ -389,7 +389,7 @@ impl Options {
     /// # Example
     ///
     /// ```
-    /// use rocksdb::Options;
+    /// use exonum_rocksdb::Options;
     ///
     /// let mut opts = Options::default();
     /// opts.set_min_write_buffer_number(2);
@@ -428,7 +428,7 @@ impl Options {
     /// # Example
     ///
     /// ```
-    /// use rocksdb::Options;
+    /// use exonum_rocksdb::Options;
     ///
     /// let mut opts = Options::default();
     /// opts.set_min_write_buffer_number(4);
@@ -459,7 +459,7 @@ impl Options {
     /// # Example
     ///
     /// ```
-    /// use rocksdb::Options;
+    /// use exonum_rocksdb::Options;
     ///
     /// let mut opts = Options::default();
     /// opts.set_write_buffer_size(128 * 1024 * 1024);
@@ -486,7 +486,7 @@ impl Options {
     /// # Example
     ///
     /// ```
-    /// use rocksdb::Options;
+    /// use exonum_rocksdb::Options;
     ///
     /// let mut opts = Options::default();
     /// opts.set_max_bytes_for_level_base(512 * 1024 * 1024);
@@ -502,7 +502,7 @@ impl Options {
     /// # Example
     ///
     /// ```
-    /// use rocksdb::Options;
+    /// use exonum_rocksdb::Options;
     ///
     /// let mut opts = Options::default();
     /// opts.set_max_bytes_for_level_multiplier(4);
@@ -520,7 +520,7 @@ impl Options {
     /// # Example
     ///
     /// ```
-    /// use rocksdb::Options;
+    /// use exonum_rocksdb::Options;
     ///
     /// let mut opts = Options::default();
     /// opts.set_max_manifest_file_size(20 * 1024 * 1024);
@@ -547,7 +547,7 @@ impl Options {
     /// # Example
     ///
     /// ```
-    /// use rocksdb::Options;
+    /// use exonum_rocksdb::Options;
     ///
     /// let mut opts = Options::default();
     /// opts.set_target_file_size_base(128 * 1024 * 1024);
@@ -571,7 +571,7 @@ impl Options {
     /// # Example
     ///
     /// ```
-    /// use rocksdb::Options;
+    /// use exonum_rocksdb::Options;
     ///
     /// let mut opts = Options::default();
     /// opts.set_min_write_buffer_number_to_merge(2);
@@ -592,7 +592,7 @@ impl Options {
     /// # Example
     ///
     /// ```
-    /// use rocksdb::Options;
+    /// use exonum_rocksdb::Options;
     ///
     /// let mut opts = Options::default();
     /// opts.set_level_zero_file_num_compaction_trigger(8);
@@ -614,7 +614,7 @@ impl Options {
     /// # Example
     ///
     /// ```
-    /// use rocksdb::Options;
+    /// use exonum_rocksdb::Options;
     ///
     /// let mut opts = Options::default();
     /// opts.set_level_zero_slowdown_writes_trigger(10);
@@ -634,7 +634,7 @@ impl Options {
     /// # Example
     ///
     /// ```
-    /// use rocksdb::Options;
+    /// use exonum_rocksdb::Options;
     ///
     /// let mut opts = Options::default();
     /// opts.set_level_zero_stop_writes_trigger(48);
@@ -652,7 +652,7 @@ impl Options {
     /// # Example
     ///
     /// ```
-    /// use rocksdb::{Options, DBCompactionStyle};
+    /// use exonum_rocksdb::{Options, DBCompactionStyle};
     ///
     /// let mut opts = Options::default();
     /// opts.set_compaction_style(DBCompactionStyle::Universal);
@@ -680,7 +680,7 @@ impl Options {
     /// # Example
     ///
     /// ```
-    /// use rocksdb::Options;
+    /// use exonum_rocksdb::Options;
     ///
     /// let mut opts = Options::default();
     /// opts.set_max_background_compactions(2);
@@ -711,7 +711,7 @@ impl Options {
     /// # Example
     ///
     /// ```
-    /// use rocksdb::Options;
+    /// use exonum_rocksdb::Options;
     ///
     /// let mut opts = Options::default();
     /// opts.set_max_background_flushes(2);
@@ -732,7 +732,7 @@ impl Options {
     /// # Example
     ///
     /// ```
-    /// use rocksdb::Options;
+    /// use exonum_rocksdb::Options;
     ///
     /// let mut opts = Options::default();
     /// opts.set_disable_auto_compactions(true);
@@ -754,7 +754,7 @@ impl Options {
     /// # Example
     ///
     /// ```
-    /// use rocksdb::Options;
+    /// use exonum_rocksdb::Options;
     ///
     /// let mut opts = Options::default();
     /// opts.set_report_bg_io_stats(true);
@@ -772,7 +772,7 @@ impl Options {
     /// # Example
     ///
     /// ```
-    /// use rocksdb::{Options, DBRecoveryMode};
+    /// use exonum_rocksdb::{Options, DBRecoveryMode};
     ///
     /// let mut opts = Options::default();
     /// opts.set_wal_recovery_mode(DBRecoveryMode::AbsoluteConsistency);
@@ -810,7 +810,7 @@ impl Options {
     /// # Example
     ///
     /// ```
-    /// use rocksdb::Options;
+    /// use exonum_rocksdb::Options;
     ///
     /// let mut opts = Options::default();
     /// opts.set_stats_dump_period_sec(300);
