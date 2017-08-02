@@ -42,7 +42,7 @@ impl TransactionDB {
         opts: &Options,
         txn_db_opts: &TransactionDBOptions,
         path: P,
-    ) -> Result<Self, Error> {
+    ) -> Result<TransactionDB, Error> {
         let path = path.as_ref();
         let cpath = match CString::new(path.to_string_lossy().as_bytes()) {
             Ok(c) => c,
@@ -223,14 +223,40 @@ impl<'a> Inner for Snapshot<'a> {
 
 impl TransactionDBOptions {
 
+    pub fn set_max_num_locks(&mut self, max_num_locks: i64) {
+        unsafe {
+            ffi::rocksdb_transactiondb_options_set_max_num_locks(self.inner, max_num_locks);
+        }
+    }
+
+    pub fn set_num_stripes(&mut self, num_stripes: usize) {
+        unsafe {
+            ffi::rocksdb_transactiondb_options_set_num_stripes(self.inner, num_stripes);
+        }
+    }
+
+    pub fn set_transaction_lock_timeout(&mut self, txn_lock_timeout: i64) {
+        unsafe {
+            ffi::rocksdb_transactiondb_options_set_transaction_lock_timeout(self.inner,
+                                                                            txn_lock_timeout);
+        }
+    }
+
+    pub fn set_default_lock_timeout(&mut self, default_lock_timeout: i64) {
+        unsafe {
+            ffi::rocksdb_transactiondb_options_set_default_lock_timeout(self.inner,
+                                                                        default_lock_timeout);
+        }
+    }
+
 }
 
 impl Default for TransactionDBOptions {
-    fn default() -> Self {
+    fn default() -> TransactionDBOptions {
         unsafe {
             let transaction_db_options = ffi::rocksdb_transactiondb_options_create();
             if transaction_db_options.is_null() {
-                panic!("Couldn't create Transaction RocksDB options");
+                panic!("couldn't create TransactionDB options");
             }
             Self { inner: transaction_db_options }
         }
