@@ -1,4 +1,4 @@
-extern crate gcc;
+extern crate cc;
 extern crate pkg_config;
 
 use pkg_config::probe_library;
@@ -22,17 +22,17 @@ fn build_rocksdb() {
     println!("cargo:rerun-if-changed=build.rs");
     println!("cargo:rerun-if-changed=rocksdb/");
 
-    let mut config = gcc::Config::new();
-    config.include("rocksdb/include/");
-    config.include("rocksdb/");
-    config.include("rocksdb/third-party/gtest-1.7.0/fused-src/");
-    config.include("snappy/");
-    config.include(".");
+    let mut build = cc::Build::new();
+    build.include("rocksdb/include/");
+    build.include("rocksdb/");
+    build.include("rocksdb/third-party/gtest-1.7.0/fused-src/");
+    build.include("snappy/");
+    build.include(".");
 
-    config.opt_level(3);
+    build.opt_level(3);
 
-    config.define("NDEBUG", Some("1"));
-    config.define("SNAPPY", Some("1"));
+    build.define("NDEBUG", Some("1"));
+    build.define("SNAPPY", Some("1"));
 
     let mut lib_sources = include_str!("rocksdb_lib_sources.txt")
         .split(" ")
@@ -46,26 +46,26 @@ fn build_rocksdb() {
         .collect::<Vec<&'static str>>();
 
     if cfg!(target_os = "macos") {
-        config.define("OS_MACOSX", Some("1"));
-        config.define("ROCKSDB_PLATFORM_POSIX", Some("1"));
-        config.define("ROCKSDB_LIB_IO_POSIX", Some("1"));
+        build.define("OS_MACOSX", Some("1"));
+        build.define("ROCKSDB_PLATFORM_POSIX", Some("1"));
+        build.define("ROCKSDB_LIB_IO_POSIX", Some("1"));
 
     }
     if cfg!(target_os = "linux") {
-        config.define("OS_LINUX", Some("1"));
-        config.define("ROCKSDB_PLATFORM_POSIX", Some("1"));
-        config.define("ROCKSDB_LIB_IO_POSIX", Some("1"));
+        build.define("OS_LINUX", Some("1"));
+        build.define("ROCKSDB_PLATFORM_POSIX", Some("1"));
+        build.define("ROCKSDB_LIB_IO_POSIX", Some("1"));
         // COMMON_FLAGS="$COMMON_FLAGS -fno-builtin-memcmp"
     }
     if cfg!(target_os = "freebsd") {
-        config.define("OS_FREEBSD", Some("1"));
-        config.define("ROCKSDB_PLATFORM_POSIX", Some("1"));
-        config.define("ROCKSDB_LIB_IO_POSIX", Some("1"));
+        build.define("OS_FREEBSD", Some("1"));
+        build.define("ROCKSDB_PLATFORM_POSIX", Some("1"));
+        build.define("ROCKSDB_LIB_IO_POSIX", Some("1"));
     }
 
     if cfg!(windows) {
         link("rpcrt4", false);
-        config.define("OS_WIN", Some("1"));
+        build.define("OS_WIN", Some("1"));
 
         // Remove POSIX-specific sources
         lib_sources = lib_sources
@@ -88,42 +88,42 @@ fn build_rocksdb() {
     }
 
     if cfg!(target_env = "msvc") {
-        config.flag("-EHsc");
+        build.flag("-EHsc");
     } else {
-        config.flag("-std=c++11");
+        build.flag("-std=c++11");
     }
 
     for file in lib_sources {
         let file = "rocksdb/".to_string() + file;
-        config.file(&file);
+        build.file(&file);
     }
 
-    config.file("build_version.cc");
-    config.cpp(true);
-    config.compile("librocksdb.a");
+    build.file("build_version.cc");
+    build.cpp(true);
+    build.compile("librocksdb.a");
 }
 
 fn build_snappy() {
-    let mut config = gcc::Config::new();
-    config.include("snappy/");
-    config.include(".");
+    let mut build = cc::Build::new();
+    build.include("snappy/");
+    build.include(".");
 
-    config.define("NDEBUG", Some("1"));
-    config.opt_level(3);
+    build.define("NDEBUG", Some("1"));
+    build.opt_level(3);
 
     if cfg!(target_env = "msvc") {
-        config.flag("-EHsc");
+        build.flag("-EHsc");
     } else {
-        config.flag("-std=c++11");
-        config.flag("-fPIC");
+        build.flag("-std=c++11");
+        build.flag("-fPIC");
     }
 
-    config.file("snappy/snappy.cc");
-    config.file("snappy/snappy-sinksource.cc");
-    config.file("snappy/snappy-c.cc");
+    build.file("snappy/snappy.cc");
+    build.file("snappy/snappy-sinksource.cc");
+    build.file("snappy/snappy-c.cc");
 
-    config.cpp(true);
-    config.compile("libsnappy.a");
+    build.cpp(true);
+    build.compile("libsnappy.a");
 }
 
 fn try_to_find_lib(library: &str) -> bool {
@@ -143,7 +143,7 @@ fn try_to_find_lib(library: &str) -> bool {
         };
         println!("cargo:rustc-link-lib={0}={1}", mode, lib_name.to_lowercase());
         return true;
-    }   
+    }
 
    if probe_library(library).is_ok() {
         true
@@ -161,10 +161,10 @@ fn get_sources(git_path: &str, rev: &str) {
                         .unwrap_or_else(|error| {
                             panic!("Failed to run git command: {}", error);
                         });
-    if !command_result.status.success() {   
-        panic!("{:?}\n{}\n{}\n", 
-            command, 
-            String::from_utf8_lossy(&command_result.stdout), 
+    if !command_result.status.success() {
+        panic!("{:?}\n{}\n{}\n",
+            command,
+            String::from_utf8_lossy(&command_result.stdout),
             String::from_utf8_lossy(&command_result.stderr)
         );
     }
@@ -183,15 +183,15 @@ fn get_sources(git_path: &str, rev: &str) {
                         .output()
                         .unwrap_or_else(|error| {
                             panic!("Failed to run git command: {}", error);
-                        });                              
+                        });
 
-    if !command_result.status.success() {   
-        panic!("{:?}\n{}\n{}\n", 
-            command, 
-            String::from_utf8_lossy(&command_result.stdout), 
+    if !command_result.status.success() {
+        panic!("{:?}\n{}\n{}\n",
+            command,
+            String::from_utf8_lossy(&command_result.stdout),
             String::from_utf8_lossy(&command_result.stderr)
         );
-    }   
+    }
 }
 
 fn main() {
